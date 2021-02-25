@@ -29,19 +29,17 @@ def gray_image(image: str, halftone_alg=ordered_dithering, kernel=None, alg='sta
     :param alg: Algorithm used for encryption: standard (same as binary) or multilevel
     :return:
     """
-    if alg != 'standard' or alg != 'multilevel':
-        raise Exception
     img = np.asarray(Image.open(image).convert('L'))
     if alg == 'standard':
         e1, e2 = _encrypt(halftone_alg(img, kernel=kernel))
     elif alg == 'multilevel':
-        e1, e2 = _multi_level_encoding(img)
+        e1, e2 = _multi_level_encoding(halftone_alg(img, kernel=kernel))
     else:
         raise Exception
     tokens = image.split('.')
     output = '.'.join(tokens[:-1])
-    Image.fromarray(e1, 'L').save(output + "-1." + tokens[-1])
-    Image.fromarray(e2, 'L').save(output + "-2." + tokens[-1])
+    Image.fromarray(e1.astype(np.int8), 'L').save(output + "-1." + tokens[-1])
+    Image.fromarray(e2.astype(np.int8), 'L').save(output + "-2." + tokens[-1])
 
 
 def colour_image(image: str, halftone_alg=ordered_dithering, kernel=None):
@@ -57,13 +55,13 @@ def colour_image(image: str, halftone_alg=ordered_dithering, kernel=None):
     img = halftone_alg(img, kernel=kernel)
     encrypted1 = []
     encrypted2 = []
-    cmy = _rgb_cmy(img)
+    cmy = img
     for i in range(3):
         e1, e2 = _encrypt(cmy[:, :, i], full_pixel=255)
         encrypted1.append(e1)
         encrypted2.append(e2)
-    i1 = Image.fromarray(_rgb_cmy(np.stack(encrypted1, axis=2)).astype(np.int8), 'RGB')
-    i2 = Image.fromarray(_rgb_cmy(np.stack(encrypted2, axis=2)).astype(np.int8), 'RGB')
+    i1 = Image.fromarray(np.stack(encrypted1, axis=2).astype(np.int8), 'RGB')
+    i2 = Image.fromarray(np.stack(encrypted2, axis=2).astype(np.int8), 'RGB')
 
     tokens = image.split('.')
     output = '.'.join(tokens[:-1])
