@@ -32,7 +32,7 @@ def gray_image(image: str, halftone_alg=ordered_dithering, kernel=None, alg='sta
         e1, e2 = _multi_level_encoding(halftone_alg(img, kernel=kernel))
     else:
         raise Exception
-    return e1.astype(np.int8), e2.astype(np.int8)
+    return e1, e2
 
 
 def colour_image(image: str, halftone_alg=ordered_dithering, kernel=None) -> (np.ndarray, np.ndarray):
@@ -53,9 +53,7 @@ def colour_image(image: str, halftone_alg=ordered_dithering, kernel=None) -> (np
         e1, e2 = _encrypt(cmy[:, :, i], full_pixel=255)
         encrypted1.append(e1)
         encrypted2.append(e2)
-    i1 = Image.fromarray(np.stack(encrypted1, axis=2).astype(np.int8), 'RGB')
-    i2 = Image.fromarray(np.stack(encrypted2, axis=2).astype(np.int8), 'RGB')
-    return i1, i2
+    return np.stack(encrypted1, axis=2), np.stack(encrypted2, axis=2)
 
 
 def _encrypt(img: np.ndarray, full_pixel: int = 0) -> (np.ndarray, np.ndarray):
