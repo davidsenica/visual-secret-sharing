@@ -4,7 +4,7 @@ import random
 from .halftone import ordered_dithering
 
 
-def binary_image(image: str):
+def binary_image(image: str) -> (np.ndarray, np.ndarray):
     """
     Function encrypts binary image (image contains only black and only white pixels)
 
@@ -12,14 +12,10 @@ def binary_image(image: str):
     :return:
     """
     img = np.asarray(Image.open(image).convert('L'))
-    e1, e2 = _encrypt(img)
-    tokens = image.split('.')
-    output = '.'.join(tokens[:-1])
-    Image.fromarray(e1, 'L').save(output + "-1." + tokens[-1])
-    Image.fromarray(e2, 'L').save(output + "-2." + tokens[-1])
+    return _encrypt(img)
 
 
-def gray_image(image: str, halftone_alg=ordered_dithering, kernel=None, alg='standard'):
+def gray_image(image: str, halftone_alg=ordered_dithering, kernel=None, alg='standard') -> (np.ndarray, np.ndarray):
     """
     Function encrypts gray image
 
@@ -36,13 +32,10 @@ def gray_image(image: str, halftone_alg=ordered_dithering, kernel=None, alg='sta
         e1, e2 = _multi_level_encoding(halftone_alg(img, kernel=kernel))
     else:
         raise Exception
-    tokens = image.split('.')
-    output = '.'.join(tokens[:-1])
-    Image.fromarray(e1.astype(np.int8), 'L').save(output + "-1." + tokens[-1])
-    Image.fromarray(e2.astype(np.int8), 'L').save(output + "-2." + tokens[-1])
+    return e1.astype(np.int8), e2.astype(np.int8)
 
 
-def colour_image(image: str, halftone_alg=ordered_dithering, kernel=None):
+def colour_image(image: str, halftone_alg=ordered_dithering, kernel=None) -> (np.ndarray, np.ndarray):
     """
     Function encrypts color images
 
@@ -62,11 +55,7 @@ def colour_image(image: str, halftone_alg=ordered_dithering, kernel=None):
         encrypted2.append(e2)
     i1 = Image.fromarray(np.stack(encrypted1, axis=2).astype(np.int8), 'RGB')
     i2 = Image.fromarray(np.stack(encrypted2, axis=2).astype(np.int8), 'RGB')
-
-    tokens = image.split('.')
-    output = '.'.join(tokens[:-1])
-    i1.save(output + "-1.png")
-    i2.save(output + "-2.png")
+    return i1, i2
 
 
 def _encrypt(img: np.ndarray, full_pixel: int = 0) -> (np.ndarray, np.ndarray):
