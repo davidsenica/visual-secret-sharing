@@ -137,5 +137,5 @@ def _multi_level_encoding(img: np.ndarray) -> (np.ndarray, np.ndarray):
 
 
 def _rgb_cmy(img: np.ndarray) -> np.ndarray:
-    return (np.ones(img.shape, dtype=np.int8) * 255) - img
+    return (np.ones(img.shape, dtype=np.uint8) * 255) - img
 

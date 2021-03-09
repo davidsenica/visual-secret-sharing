@@ -29,7 +29,7 @@ def _error_diffusion(img: np.ndarray, kernel: np.ndarray) -> np.ndarray:
     h, w = img.shape[0], img.shape[1]
     orig = np.zeros((h + k_h - 1, w + k_w - 1))
     orig[int(k_h/2):h + int(k_h/2), int(k_w/2):w + int(k_w/2)] = img
-    output = np.zeros((h + k_h - 1, w + k_w - 1))
+    output = np.zeros((h + k_h - 1, w + k_w - 1), dtype=np.uint8)
     for x in range(int(k_h/2), h):
         for y in range(int(k_w/2), w):
             is_white = (float(orig[x, y]) / 255) > 0.5
@@ -70,7 +70,7 @@ def _ordered_dithering(img: np.ndarray, kernel: np.ndarray) -> np.ndarray:
     k_h, k_w = kernel.shape[0], kernel.shape[1]
     h, w = img.shape[0], img.shape[1]
     orig = np.zeros((h + (h % k_h), w + (w % k_w)))
-    output = np.zeros((h + (h % k_h), w + (w % k_w)))
+    output = np.zeros((h + (h % k_h), w + (w % k_w)), dtype=np.uint8)
     orig[0:h, 0:w] = np.float32(img) / 255.0
     for x in range(0, orig.shape[0], k_h):
         for y in range(0, orig.shape[1], k_w):
