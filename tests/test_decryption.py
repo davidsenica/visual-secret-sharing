@@ -10,4 +10,6 @@ def test_binary():
 
 
 def test_colour():
-    pass
+    decrypted = vss.decrypt_colour('tests/images/lena-1.png', 'tests/images/lena-2.png')
+    expected = np.asarray(Image.open('tests/images/decrypted-lena.png'))
+    np.testing.assert_array_equal(decrypted, expected)
