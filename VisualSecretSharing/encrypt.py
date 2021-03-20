@@ -31,7 +31,7 @@ def gray_image(image: str, halftone_alg=ordered_dithering, kernel=None, alg='sta
     elif alg == 'multilevel':
         e1, e2 = _multi_level_encoding(halftone_alg(img, kernel=kernel))
     else:
-        raise Exception
+        raise Exception('Algorithm not implemented')
     return e1, e2
 
 
@@ -134,8 +134,3 @@ def _multi_level_encoding(img: np.ndarray) -> (np.ndarray, np.ndarray):
             encrypted1[i, j:j + 4] = m[0]
             encrypted2[i, j:j + 4] = m[1]
     return encrypted1, encrypted2
-
-
-def _rgb_cmy(img: np.ndarray) -> np.ndarray:
-    return (np.ones(img.shape, dtype=np.uint8) * 255) - img
-

@@ -46,7 +46,8 @@ def main():
     parser.add_argument('-d', '--decrypt', choices=['b', 'g', 'c'],
                         help='Decrypt image, choose b for binary image, g for gray and c for colour image')
     parser.add_argument('-o', '--output', action="store", help='Output directory')
-    parser.add_argument('image', type=str, nargs="+", help='Image for encryption or shares for decryption')
+    parser.add_argument('image', type=str, nargs="+", help='Image for encryption or shares for decryption. '
+                                                           'In case of decryption it takes in two images.')
     args = parser.parse_args()
     if not args.encrypt and not args.decrypt:
         raise Exception('Please choose encryption or decryption')
