@@ -6,7 +6,7 @@ from .halftone import ordered_dithering
 
 def binary_image(image: str) -> (np.ndarray, np.ndarray):
     """
-    Function encrypts binary image (image contains only black and only white pixels)
+    Function encrypts binary image (image contains only black and white pixels)
 
     :param image: Location of the image
     :return:
@@ -17,7 +17,7 @@ def binary_image(image: str) -> (np.ndarray, np.ndarray):
 
 def gray_image(image: str, halftone_alg=ordered_dithering, kernel=None, alg='standard') -> (np.ndarray, np.ndarray):
     """
-    Function encrypts gray image
+    Function encrypts gray image with halftone_alg for preprocessing of image
 
     :param image: Location of the image
     :param halftone_alg: Algorithm used for halftone
@@ -37,7 +37,7 @@ def gray_image(image: str, halftone_alg=ordered_dithering, kernel=None, alg='sta
 
 def colour_image(image: str, halftone_alg=ordered_dithering, kernel=None) -> (np.ndarray, np.ndarray):
     """
-    Function encrypts color images
+    Function encrypts color images. Each channel is encrypted separately and then joined together.
 
     :param image: Location of the image
     :param halftone_alg: Algorithm used for halftone

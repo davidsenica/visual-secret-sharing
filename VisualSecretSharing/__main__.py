@@ -15,8 +15,8 @@ def encrypt_binary(image: str, output_dir: str = None):
     Image.fromarray(e2, 'L').save(output + "-2." + tokens[-1])
 
 
-def encrypt_gray(image: str, halftone_alg=vss.ordered_dithering, kernel=None, alg='standard', output_dir: str = None):
-    e1, e2 = vss.gray_image(image, halftone_alg, kernel, alg)
+def encrypt_gray(image: str, output_dir: str = None):
+    e1, e2 = vss.gray_image(image)
     tokens = image.split('.')
     if output_dir:
         output = output_dir + tokens[-2].split('/')[-1]
