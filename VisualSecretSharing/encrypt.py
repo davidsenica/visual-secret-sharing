@@ -4,15 +4,22 @@ import random
 from .halftone import ordered_dithering
 
 
-def binary_image(image: str) -> (np.ndarray, np.ndarray):
+def binary_image(image: str, alg='standard') -> (np.ndarray, np.ndarray):
     """
     Function encrypts binary image (image contains only black and white pixels)
 
     :param image: Location of the image
-    :return:
+    :param alg: Algorithm used for encryption: standard or multilevel
+    :return: two 2D numpy arrays which represent shares
     """
     img = np.asarray(Image.open(image).convert('L'))
-    return _encrypt(img)
+    if alg == 'standard':
+        e1, e2 = _encrypt(img)
+    elif alg == 'multilevel':
+        e1, e2 = _multi_level_encoding(img)
+    else:
+        raise Exception('Algorithm not implemented')
+    return e1, e2
 
 
 def gray_image(image: str, halftone_alg=ordered_dithering, kernel=None, alg='standard') -> (np.ndarray, np.ndarray):
@@ -22,8 +29,8 @@ def gray_image(image: str, halftone_alg=ordered_dithering, kernel=None, alg='sta
     :param image: Location of the image
     :param halftone_alg: Algorithm used for halftone
     :param kernel: Kernel passed to halftone algorithm
-    :param alg: Algorithm used for encryption: standard (same as binary) or multilevel
-    :return:
+    :param alg: Algorithm used for encryption: standard or multilevel
+    :return: two 2D numpy arrays which represent shares
     """
     img = np.asarray(Image.open(image).convert('L'))
     if alg == 'standard':
@@ -42,15 +49,14 @@ def colour_image(image: str, halftone_alg=ordered_dithering, kernel=None) -> (np
     :param image: Location of the image
     :param halftone_alg: Algorithm used for halftone
     :param kernel: Kernel passed to halftone algorithm
-    :return:
+    :return: two 3D numpy arrays which represent shares
     """
     img = np.asarray(Image.open(image))
     img = halftone_alg(img, kernel=kernel)
     encrypted1 = []
     encrypted2 = []
-    cmy = img
-    for i in range(3):
-        e1, e2 = _encrypt(cmy[:, :, i], full_pixel=255)
+    for i in range(img.shape[2]):
+        e1, e2 = _encrypt(img[:, :, i], full_pixel=255)
         encrypted1.append(e1)
         encrypted2.append(e2)
     return np.stack(encrypted1, axis=2), np.stack(encrypted2, axis=2)
@@ -59,11 +65,11 @@ def colour_image(image: str, halftone_alg=ordered_dithering, kernel=None) -> (np
 def _encrypt(img: np.ndarray, full_pixel: int = 0) -> (np.ndarray, np.ndarray):
     height, width = img.shape
 
-    full_pixel_share1 = [[[0, 255],[255, 0]], [[255, 0], [0, 255]], [[255, 0], [255, 0]], [[0, 255], [0, 255]]]
-    full_pixel_share2 = [[[255, 0], [0, 255]], [[0, 255],[255, 0]], [[0, 255], [0, 255]], [[255, 0], [255, 0]]]
+    full_pixel_share1 = [[[0, 255], [255, 0]], [[255, 0], [0, 255]], [[255, 0], [255, 0]], [[0, 255], [0, 255]]]
+    full_pixel_share2 = [[[255, 0], [0, 255]], [[0, 255], [255, 0]], [[0, 255], [0, 255]], [[255, 0], [255, 0]]]
 
-    empty_pixel_share1 = [[[0, 255],[255, 0]], [[255, 0], [0, 255]], [[255, 0], [255, 0]], [[0, 255], [0, 255]]]
-    empty_pixel_share2 = [[[0, 255],[255, 0]], [[255, 0], [0, 255]], [[255, 0], [255, 0]], [[0, 255], [0, 255]]]
+    empty_pixel_share1 = [[[0, 255], [255, 0]], [[255, 0], [0, 255]], [[255, 0], [255, 0]], [[0, 255], [0, 255]]]
+    empty_pixel_share2 = [[[0, 255], [255, 0]], [[255, 0], [0, 255]], [[255, 0], [255, 0]], [[0, 255], [0, 255]]]
 
     encrypted1 = np.zeros((height * 2, width * 2), dtype=np.uint8)
     encrypted2 = np.zeros((height * 2, width * 2), dtype=np.uint8)
@@ -94,6 +100,7 @@ def _multi_level_encoding(img: np.ndarray) -> (np.ndarray, np.ndarray):
             else:
                 black += 1
         return black, white
+
     height, width = img.shape
 
     M0 = [([0, 0, 255, 255], [0, 0, 255, 255]),
@@ -120,11 +127,11 @@ def _multi_level_encoding(img: np.ndarray) -> (np.ndarray, np.ndarray):
           ([0, 0, 255, 255], [255, 255, 0, 0]),
           ([0, 255, 0, 255], [255, 0, 255, 0])]
 
-    encrypted1 = np.zeros(img.shape)
-    encrypted2 = np.zeros(img.shape)
+    encrypted1 = np.zeros(img.shape, dtype=np.uint8)
+    encrypted2 = np.zeros(img.shape, dtype=np.uint8)
     for i in range(height):
         for j in range(0, width, 4):
-            b, w = _count_white_black(img[i, j:j+4])
+            b, w = _count_white_black(img[i, j:j + 4])
             if w == 4 or w == 3:
                 m = M0[random.randint(0, len(M0) - 1)]
             elif w == 2:

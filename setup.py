@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 setup(
     name='VisualSecretSharing',
     packages=find_packages(include=['VisualSecretSharing']),
-    version='0.0.1',
+    version='1.0.0',
     description='Basic function to create encrypted images.',
     author='David Šenica',
     license='MIT',

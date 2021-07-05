@@ -4,10 +4,9 @@ import numpy as np
 def error_diffusion(img: np.ndarray, kernel: np.ndarray = None) -> np.ndarray:
     """
     Halftone using error diffusion method.
-    
 
     :param img: 2D/3D numpy array of image (2D for gray and 3D for colour images)
-    :param kernel: kernel used for error distribution
+    :param kernel: matrix used for error distribution
     :return: 2D/3D numpy array of halftone image
     """
     if kernel is None:
@@ -45,7 +44,7 @@ def ordered_dithering(img: np.ndarray, kernel: np.ndarray = None) -> np.ndarray:
     Halftone using ordered dithering method
 
     :param img: 2D/3D numpy array of image (2D for gray and 3D for colour images)
-    :param kernel: kernel used for defining fullness of pixel
+    :param kernel: dithering matrix
     :return: 2D/3D numpy array of halftone image
     """
     if kernel is None:
@@ -59,7 +58,7 @@ def ordered_dithering(img: np.ndarray, kernel: np.ndarray = None) -> np.ndarray:
               [63, 31, 55, 23, 61, 29, 53, 21]], dtype=np.float32) / 64.0
     if len(img.shape) == 3:
         output = []
-        for i in range(3):
+        for i in range(img.shape[2]):
             output.append(_ordered_dithering(img[:, :, i], kernel=kernel))
         return np.dstack(output)
     else:
