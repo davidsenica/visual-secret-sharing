@@ -72,8 +72,10 @@ def _ordered_dithering(img: np.ndarray, kernel: np.ndarray) -> np.ndarray:
     output = np.zeros((h + (h % k_h), w + (w % k_w)), dtype=np.uint8)
     orig[0:h, 0:w] = np.float32(img) / 255.0
     for x in range(0, orig.shape[0], k_h):
+        x_shape = k_h if x+k_h < orig.shape[0] else orig.shape[0] - x
         for y in range(0, orig.shape[1], k_w):
-            mask = np.zeros(kernel.shape)
-            mask[orig[x:x+k_h, y:y+k_w] > kernel] = 255
-            output[x:x+k_h, y:y+k_w] = mask
+            y_shape = k_w if y + k_w < orig.shape[1] else orig.shape[1] - y
+            mask = np.zeros((x_shape, y_shape))
+            mask[orig[x:x+x_shape, y:y+y_shape] > kernel[0:x_shape, 0:y_shape]] = 255
+            output[x:x+x_shape, y:y+y_shape] = mask
     return output[0:h, 0:w]
